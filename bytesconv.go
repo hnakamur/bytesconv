@@ -14,20 +14,20 @@ var ErrSyntax = errors.New("invalid syntax")
 // A NumError records a failed conversion.
 type NumError struct {
 	Func string // the failing function (ParseBool, ParseInt, ParseUint, ParseFloat)
-	Num  string // the input
+	Num  []byte // the input
 	Err  error  // the reason the conversion failed (ErrRange, ErrSyntax)
 }
 
 func (e *NumError) Error() string {
-	return "" + e.Func + ": " + "parsing " + strconv.Quote(e.Num) + ": " + e.Err.Error()
+	return "" + e.Func + ": " + "parsing " + strconv.Quote(string(e.Num)) + ": " + e.Err.Error()
 }
 
-func syntaxError(fn, str string) *NumError {
-	return &NumError{fn, str, ErrSyntax}
+func syntaxError(fn string, num []byte) *NumError {
+	return &NumError{fn, num, ErrSyntax}
 }
 
-func rangeError(fn, str string) *NumError {
-	return &NumError{fn, str, ErrRange}
+func rangeError(fn string, num []byte) *NumError {
+	return &NumError{fn, num, ErrRange}
 }
 
 const intSize = 32 << (^uint(0) >> 63)
@@ -38,7 +38,7 @@ const IntSize = intSize
 const maxUint64 = (1<<64 - 1)
 
 // ParseUint is like ParseInt but for unsigned numbers.
-func ParseUint(s string, base int, bitSize int) (uint64, error) {
+func ParseUint(s []byte, base int, bitSize int) (uint64, error) {
 	var n uint64
 	var err error
 	var cutoff, maxVal uint64
@@ -136,7 +136,7 @@ Error:
 	return n, &NumError{"ParseUint", s, err}
 }
 
-// ParseInt interprets a string s in the given base (2 to 36) and
+// ParseInt interprets a byte slice s in the given base (2 to 36) and
 // returns the corresponding value i. If base == 0, the base is
 // implied by the string's prefix: base 16 for "0x", base 8 for
 // "0", and base 10 otherwise.
@@ -152,7 +152,7 @@ Error:
 // signed integer of the given size, err.Err = ErrRange and the
 // returned value is the maximum magnitude integer of the
 // appropriate bitSize and sign.
-func ParseInt(s string, base int, bitSize int) (i int64, err error) {
+func ParseInt(s []byte, base int, bitSize int) (i int64, err error) {
 	const fnParseInt = "ParseInt"
 
 	if bitSize == 0 {
@@ -197,7 +197,7 @@ func ParseInt(s string, base int, bitSize int) (i int64, err error) {
 }
 
 // Atoi returns the result of ParseInt(s, 10, 0) converted to type int.
-func Atoi(s string) (int, error) {
+func Atoi(s []byte) (int, error) {
 	const fnAtoi = "Atoi"
 	i64, err := ParseInt(s, 10, 0)
 	if nerr, ok := err.(*NumError); ok {

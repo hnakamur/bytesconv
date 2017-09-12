@@ -8,7 +8,7 @@
 //   2) shift decimal by exponent
 //   3) read digits out & format
 
-package strconv
+package bytesconv
 
 import "math"
 
@@ -41,8 +41,8 @@ var float64info = floatInfo{52, 11, -1023}
 // For 'g' and 'G' it is the total number of digits.
 // The special precision -1 uses the smallest number of digits
 // necessary such that ParseFloat will return f exactly.
-func FormatFloat(f float64, fmt byte, prec, bitSize int) string {
-	return string(genericFtoa(make([]byte, 0, max(prec+4, 24)), f, fmt, prec, bitSize))
+func FormatFloat(f float64, fmt byte, prec, bitSize int) []byte {
+	return genericFtoa(make([]byte, 0, max(prec+4, 24)), f, fmt, prec, bitSize)
 }
 
 // AppendFloat appends the string form of the floating-point number f,

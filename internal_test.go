@@ -4,7 +4,7 @@
 
 // export access to strconv internals for tests
 
-package strconv
+package bytesconv
 
 func NewDecimal(i uint64) *decimal {
 	d := new(decimal)
